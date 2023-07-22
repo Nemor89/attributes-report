@@ -1,0 +1,54 @@
+version: '3'
+services:
+    web:
+        image: nginx
+        volumes:
+            - ./docker/conf/nginx/default.conf:/etc/nginx/conf.d/default.conf
+            - .:/var/www/html
+        ports:
+            - "8077:8077"
+        restart: always
+        depends_on:
+            - php
+            - db
+        networks:
+            - attributes
+
+    php:
+        build: docker
+        environment:
+            PHP_IDE_CONFIG: "serverName=attribute"
+            XDEBUG_CONFIG: client_host=${LOCAL_HOST}
+        restart: always
+        volumes:
+            - ./docker/conf/php/php.ini:/usr/local/etc/php/conf.d/php.ini
+            - ./docker/conf/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+            - .:/var/www/html
+        networks:
+            - attributes
+
+    composer:
+        image: composer
+        volumes:
+            - .:/app
+        command: install
+        networks:
+            - attributes
+
+    db:
+        image: postgres:13
+        restart: always
+        environment:
+            - POSTGRES_DB=${DB_NAME}
+            - POSTGRES_USER=${DB_USER}
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+        ports:
+            - "5434:5434"
+        volumes:
+            - ./docker/conf/postgres/:/docker-entrypoint-initdb.d/
+        networks:
+            - attributes
+
+networks:
+    attributes:
+        driver: bridge
