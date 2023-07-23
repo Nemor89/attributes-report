@@ -1,5 +1,13 @@
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
+#imports:
+#    - { resource: '../config/packages/open_weather_api.yaml' }
+
+parameters:
+    api_url: 'https://api.openweathermap.org/data/2.5/weather'
+    api_key: 'a16293561656e22906ae4fe2201211c2'
+    api_temperature_format: 'metric'
+    api_language: 'ru'
 
 services:
     # default configuration for services in *this* file
@@ -11,3 +19,11 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+
+    App\Weather\Connector\OpenWeatherConnector: ~
+    App\Weather\OpenWeatherGateway: ~
+
+    App\Weather\Config\OpenWeatherApiConfig:
+        arguments: ['%api_url%', '%api_key%', '%api_temperature_format%', '%api_language%']
+
+    App\Weather\Connector\Connector: '@App\Weather\Connector\OpenWeatherConnector'
