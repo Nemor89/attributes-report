@@ -49,6 +49,15 @@ services:
         networks:
             - attributes
 
+    redis:
+        image: redis:6.0
+        restart: always
+        ports:
+            - "6377:6377"
+        command: redis-server --appendonly yes
+        networks:
+            - attributes
+
 networks:
     attributes:
         driver: bridge
