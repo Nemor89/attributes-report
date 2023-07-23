@@ -40,13 +40,19 @@ class OpenWeatherGateway
         $response = $this->connector->makeResponse($query);
 
         if ($response->getStatusCode() !== Response::HTTP_OK) {
-            throw new HttpException("Не удалось получить актуальный прогноз погоды для города - $city");
+            throw new HttpException(
+                statusCode: $response->getStatusCode(),
+                message: "Не удалось получить актуальный прогноз погоды для города - $city"
+            );
         }
 
         try {
             return WeatherResponseBuilder::build($response->getContent());
         } catch (Throwable) {
-            throw new HttpException('Не удалось обработать ответ от погодной службы');
+            throw new HttpException(
+                statusCode: Response::HTTP_INTERNAL_SERVER_ERROR,
+                message: 'Не удалось обработать ответ от погодной службы'
+            );
         }
     }
 }
