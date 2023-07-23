@@ -3,38 +3,48 @@
 
 namespace App\Attribute;
 
+use App\Cache\Enum\CacheEngine;
+use App\Cache\Enum\CacheStrategy;
 use Attribute;
-use DateTimeInterface;
 
-#[Attribute(flags: Attribute::TARGET_CLASS)]
+#[Attribute(flags: Attribute::TARGET_METHOD)]
 class Cacheable
 {
     public function __construct(
-        private readonly DateTimeInterface $lifeTime,
-        private readonly string $cacheEngine = 'redis',
-        private readonly string $strategy = 'readonly',
+        private readonly CacheEngine $cacheEngine,
+        private readonly CacheStrategy $strategy,
+        private readonly string $namespace = '',
+        private readonly int $lifeTime = 30,
     ) {}
 
     /**
-     * @return DateTimeInterface
+     * @return string
      */
-    public function getLifeTime(): DateTimeInterface
+    public function getNamespace(): string
+    {
+        return $this->namespace;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLifeTime(): int
     {
         return $this->lifeTime;
     }
 
     /**
-     * @return string
+     * @return CacheEngine
      */
-    public function getCacheEngine(): string
+    public function getCacheEngine(): CacheEngine
     {
         return $this->cacheEngine;
     }
 
     /**
-     * @return string
+     * @return CacheStrategy
      */
-    public function getStrategy(): string
+    public function getStrategy(): CacheStrategy
     {
         return $this->strategy;
     }
